@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { LogOut, Calendar, TrendingUp, CheckCircle, Clock, Truck, Trash2, Archive, DollarSign, X, ChevronRight, Store, Lock, ShoppingBag, Edit2, Save, Users, MapPin, Phone, FileText, Copy, Bell } from 'lucide-react';
+import { LogOut, Calendar, TrendingUp, CheckCircle, Clock, Truck, Trash2, Archive, DollarSign, X, ChevronRight, Store, Lock, ShoppingBag, Edit2, Save, Users, MapPin, Phone, FileText, Copy, Bell, BellOff, Volume2 } from 'lucide-react';
 import { Product, Order } from '../types';
 import { useOrders } from '../hooks/useOrders';
 import { useCustomers } from '../hooks/useCustomers';
@@ -14,6 +14,8 @@ interface AdminDashboardProps {
 }
 
 
+
+const NOTIFICATION_SOUND_URL = 'https://raw.githubusercontent.com/Shashank-S-V/Notification-Sound/master/Notification.mp3';
 
 // Helper para formatar itens do pedido
 const formatOrderItems = (order: Order): string[] => {
@@ -185,15 +187,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, isStor
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [expandedSection, setExpandedSection] = useState<'in-progress' | 'delivery' | 'completed' | null>(null);
   const [notification, setNotification] = useState<{ id: number; customer: string } | null>(null);
+  const [isSoundEnabled, setIsSoundEnabled] = useState(false);
   const prevOrdersCount = useRef(orders.length);
 
-  // Sound Logic
   const playNotificationSound = () => {
-    // Definitive Mixkit Service Bell sound
-    const audio = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-service-bell-1461.mp3');
-    audio.volume = 1.0;
-    audio.play().catch(err => console.error("Erro ao tocar som:", err));
+    if (!isSoundEnabled) return;
+    const audio = new Audio(NOTIFICATION_SOUND_URL);
+    audio.volume = 1.0; // Volume alto como solicitado
+    audio.play().catch(err => console.error('Erro ao tocar som:', err));
   };
+
 
   useEffect(() => {
     // Detect new orders
@@ -282,6 +285,30 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, isStor
 
         {/* CONTROLS */}
         <div className="flex items-center gap-2">
+
+
+          {/* SOUND TOGGLE */}
+          <button
+            onClick={() => {
+              setIsSoundEnabled(!isSoundEnabled);
+              // Tocar um som curto para confirmar a ativação e satisfazer o navegador
+              if (!isSoundEnabled) {
+                const audio = new Audio(NOTIFICATION_SOUND_URL);
+                audio.volume = 0.2; // Feedback suave ao ativar
+                audio.play().catch(() => { });
+              }
+            }}
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg border transition-all ${isSoundEnabled
+              ? 'bg-yellow-500/10 border-yellow-500/50 text-yellow-500 hover:bg-yellow-500/20'
+              : 'bg-stone-700 border-white/10 text-white/30 hover:bg-stone-600'
+              }`}
+            title={isSoundEnabled ? "Som Ativado" : "Som Desativado (Clique para ativar)"}
+          >
+            {isSoundEnabled ? <Volume2 size={18} /> : <BellOff size={18} />}
+            <span className="text-xs font-bold uppercase hidden md:inline">
+              {isSoundEnabled ? 'Som ON' : 'Som OFF'}
+            </span>
+          </button>
 
           {/* STORE TOGGLE */}
           <button
