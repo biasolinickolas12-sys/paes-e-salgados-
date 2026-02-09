@@ -15,7 +15,7 @@ interface AdminDashboardProps {
 
 
 
-const NOTIFICATION_SOUND_URL = 'https://raw.githubusercontent.com/Shashank-S-V/Notification-Sound/master/Notification.mp3';
+const NOTIFICATION_SOUND_URL = '/notification.mp3';
 
 // Helper para formatar itens do pedido
 const formatOrderItems = (order: Order): string[] => {
@@ -193,8 +193,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, isStor
   const playNotificationSound = () => {
     if (!isSoundEnabled) return;
     const audio = new Audio(NOTIFICATION_SOUND_URL);
-    audio.volume = 1.0; // Volume alto como solicitado
-    audio.play().catch(err => console.error('Erro ao tocar som:', err));
+    audio.volume = 1.0;
+    audio.play().catch(err => {
+      console.error('Erro detalhado ao tocar som:', err);
+      if (err.name === 'NotSupportedError') {
+        console.warn('O formato do áudio ou a URL não são suportados pelo navegador.');
+      }
+    });
   };
 
 
