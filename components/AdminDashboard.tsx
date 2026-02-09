@@ -190,16 +190,22 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, isStor
   const [isSoundEnabled, setIsSoundEnabled] = useState(false);
   const prevOrdersCount = useRef(orders.length);
 
-  const playNotificationSound = () => {
-    if (!isSoundEnabled) return;
+  const playNotificationSound = (isTest = false) => {
+    if (!isSoundEnabled && !isTest) return;
+
+    console.log(`Tentando tocar som: ${NOTIFICATION_SOUND_URL} (Teste: ${isTest})`);
     const audio = new Audio(NOTIFICATION_SOUND_URL);
     audio.volume = 1.0;
-    audio.play().catch(err => {
-      console.error('Erro detalhado ao tocar som:', err);
-      if (err.name === 'NotSupportedError') {
-        console.warn('O formato do áudio ou a URL não são suportados pelo navegador.');
-      }
-    });
+
+    // Pequeno atraso para garantir que o objeto de áudio esteja pronto
+    audio.play()
+      .then(() => console.log('Som reproduzido com sucesso!'))
+      .catch(err => {
+        console.error('ERRO AO TOCAR SOM:', err);
+        if (isTest) {
+          alert(`Erro ao tocar som: ${err.message}\nVerifique se o arquivo /notification.mp3 existe no servidor.`);
+        }
+      });
   };
 
 
@@ -314,6 +320,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, isStor
               {isSoundEnabled ? 'Som ON' : 'Som OFF'}
             </span>
           </button>
+
+          {/* TEST SOUND BUTTON (ONLY IF ON) */}
+          {isSoundEnabled && (
+            <button
+              onClick={() => playNotificationSound(true)}
+              className="px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white/50 hover:bg-white/10 text-xs font-bold transition-all"
+              title="Testar Som"
+            >
+              TESTAR
+            </button>
+          )}
 
           {/* STORE TOGGLE */}
           <button
