@@ -32,6 +32,27 @@ export function useOrders() {
 
     useEffect(() => {
         fetchOrders();
+
+        // Subscribe to real-time changes
+        const channel = supabase
+            .channel('orders-realtime')
+            .on(
+                'postgres_changes',
+                {
+                    event: 'INSERT',
+                    schema: 'public',
+                    table: 'orders'
+                },
+                (payload) => {
+                    console.log('Novo pedido recebido:', payload);
+                    fetchOrders();
+                }
+            )
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
     }, []);
 
     async function fetchOrders() {

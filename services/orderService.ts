@@ -1,5 +1,5 @@
 import { supabase } from '../lib/supabase';
-import { CartItem } from '../types';
+import { CartItem } from '../../types';
 
 interface CreateOrderParams {
     customerName: string;

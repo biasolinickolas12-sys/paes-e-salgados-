@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { LogOut, Calendar, TrendingUp, CheckCircle, Clock, Truck, Trash2, Archive, DollarSign, X, ChevronRight, Store, Lock, ShoppingBag, Edit2, Save, Users, MapPin, Phone, FileText, Copy } from 'lucide-react';
+import { LogOut, Calendar, TrendingUp, CheckCircle, Clock, Truck, Trash2, Archive, DollarSign, X, ChevronRight, Store, Lock, ShoppingBag, Edit2, Save, Users, MapPin, Phone, FileText, Copy, Bell } from 'lucide-react';
 import { Product, Order } from '../types';
 import { useOrders } from '../hooks/useOrders';
 import { useCustomers } from '../hooks/useCustomers';
+import { useEffect, useRef } from 'react';
 
 interface AdminDashboardProps {
   onLogout: () => void;
@@ -183,6 +184,32 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, isStor
   const [view, setView] = useState<'dashboard' | 'history' | 'catalog' | 'clients'>('dashboard');
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [expandedSection, setExpandedSection] = useState<'in-progress' | 'delivery' | 'completed' | null>(null);
+  const [notification, setNotification] = useState<{ id: number; customer: string } | null>(null);
+  const prevOrdersCount = useRef(orders.length);
+
+  // Sound Logic
+  const playNotificationSound = () => {
+    const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
+    audio.play().catch(err => console.error("Erro ao tocar som:", err));
+  };
+
+  useEffect(() => {
+    // Detect new orders
+    if (orders.length > prevOrdersCount.current) {
+      const newOrder = orders[0]; // Orders are sorted by date descending
+      if (newOrder && newOrder.status === 'pending') {
+        setNotification({ id: newOrder.id, customer: newOrder.customer_name });
+        playNotificationSound();
+
+        // Auto-hide notification after 5 seconds
+        const timer = setTimeout(() => {
+          setNotification(null);
+        }, 5000);
+        return () => clearTimeout(timer);
+      }
+    }
+    prevOrdersCount.current = orders.length;
+  }, [orders]);
 
   // Cálculos de Faturamento
   const currentMonth = new Date().toLocaleString('pt-BR', { month: 'long' });
@@ -685,6 +712,36 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, isStor
             </div>
 
           </div>
+        </div>
+      )}
+      {/* 
+        NEW ORDER NOTIFICATION TOAST
+      */}
+      {notification && (
+        <div
+          className="fixed top-6 right-6 z-[100] bg-brand-orange text-white p-4 rounded-2xl shadow-2xl flex items-center gap-4 animate-slide-left border border-white/20 cursor-pointer hover:scale-105 transition-transform"
+          onClick={() => {
+            setNotification(null);
+            setView('dashboard');
+            setExpandedSection('in-progress');
+          }}
+        >
+          <div className="bg-white/20 p-2 rounded-xl">
+            <Bell size={24} className="animate-bounce" />
+          </div>
+          <div>
+            <p className="font-bold text-sm uppercase tracking-wider">Novo Pedido!</p>
+            <p className="text-white/90 text-sm">#{notification.id} - {notification.customer}</p>
+          </div>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setNotification(null);
+            }}
+            className="ml-2 p-1 hover:bg-white/10 rounded-full transition"
+          >
+            <X size={18} />
+          </button>
         </div>
       )}
 
