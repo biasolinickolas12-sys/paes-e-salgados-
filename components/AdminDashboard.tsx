@@ -189,7 +189,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, isStor
 
   // Sound Logic
   const playNotificationSound = () => {
-    const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/1461/1461-preview.mp3');
+    // Definitive Mixkit Service Bell sound
+    const audio = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-service-bell-1461.mp3');
     audio.volume = 1.0;
     audio.play().catch(err => console.error("Erro ao tocar som:", err));
   };
