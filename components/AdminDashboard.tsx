@@ -193,19 +193,26 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, isStor
   const playNotificationSound = (isTest = false) => {
     if (!isSoundEnabled && !isTest) return;
 
-    console.log(`Tentando tocar som: ${NOTIFICATION_SOUND_URL} (Teste: ${isTest})`);
-    const audio = new Audio(NOTIFICATION_SOUND_URL);
-    audio.volume = 1.0;
+    const tryPlay = (url: string, isFallback = false) => {
+      console.log(`Tentando tocar som: ${url} (Teste: ${isTest})`);
+      const audio = new Audio(url);
+      audio.volume = 1.0;
 
-    // Pequeno atraso para garantir que o objeto de áudio esteja pronto
-    audio.play()
-      .then(() => console.log('Som reproduzido com sucesso!'))
-      .catch(err => {
-        console.error('ERRO AO TOCAR SOM:', err);
-        if (isTest) {
-          alert(`Erro ao tocar som: ${err.message}\nVerifique se o arquivo /notification.mp3 existe no servidor.`);
-        }
-      });
+      return audio.play()
+        .then(() => console.log(`Som (${url}) reproduzido com sucesso!`))
+        .catch(err => {
+          console.error(`ERRO AO TOCAR SOM (${url}):`, err);
+          if (!isFallback) {
+            console.log('Tentando som de reserva...');
+            return tryPlay('/notification_test.mp3', true);
+          }
+          if (isTest) {
+            alert(`Erro ao tocar som: ${err.message}\nVerifique se os arquivos (/notification.mp3 ou /notification_test.mp3) foram commitados na pasta public.`);
+          }
+        });
+    };
+
+    tryPlay(NOTIFICATION_SOUND_URL);
   };
 
 
@@ -456,12 +463,20 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, isStor
                         key={order.id}
                         order={order}
                         actions={
-                          <button
-                            onClick={() => handleStatusChange(order.id, 'confirmed')}
-                            className="bg-green-600 text-white px-3 py-1 rounded text-xs font-bold hover:bg-green-500 transition"
-                          >
-                            Confirmar
-                          </button>
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => handleStatusChange(order.id, 'confirmed')}
+                              className="bg-green-600 text-white px-3 py-1 rounded text-xs font-bold hover:bg-green-500 transition"
+                            >
+                              Confirmar
+                            </button>
+                            <button
+                              onClick={() => handleDelete(order.id)}
+                              className="bg-red-600/20 text-red-500 border border-red-500/30 px-3 py-1 rounded text-xs font-bold hover:bg-red-600 hover:text-white transition"
+                            >
+                              Recusar
+                            </button>
+                          </div>
                         }
                       />
                     ))}
@@ -473,12 +488,20 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, isStor
                         <OrderCard
                           order={order}
                           actions={
-                            <button
-                              onClick={() => handleStatusChange(order.id, 'preparing')}
-                              className="bg-blue-600 text-white px-3 py-1 rounded text-xs font-bold hover:bg-blue-500 transition flex items-center gap-1"
-                            >
-                              <Truck size={12} /> Despachar
-                            </button>
+                            <div className="flex gap-2">
+                              <button
+                                onClick={() => handleStatusChange(order.id, 'preparing')}
+                                className="bg-blue-600 text-white px-3 py-1 rounded text-xs font-bold hover:bg-blue-500 transition flex items-center gap-1"
+                              >
+                                <Truck size={12} /> Despachar
+                              </button>
+                              <button
+                                onClick={() => handleDelete(order.id)}
+                                className="bg-red-600/20 text-red-500 border border-red-500/30 px-3 py-1 rounded text-xs font-bold hover:bg-red-600 hover:text-white transition"
+                              >
+                                Recusar
+                              </button>
+                            </div>
                           }
                         />
                       </div>
