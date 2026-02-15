@@ -204,6 +204,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [notification, setNotification] = useState<{ id: number; customer: string } | null>(null);
   const [isSoundEnabled, setIsSoundEnabled] = useState(false);
   const prevOrdersCount = useRef(orders.length);
+  const [localBanner, setLocalBanner] = useState(bannerSettings);
+  const [isSavingBanner, setIsSavingBanner] = useState(false);
+
+  // Sincroniza o estado local quando os dados chegam do banco
+  useEffect(() => {
+    setLocalBanner(bannerSettings);
+  }, [bannerSettings]);
 
   const playNotificationSound = (isTest = false) => {
     if (!isSoundEnabled && !isTest) return;
@@ -630,14 +637,19 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   </div>
                 </div>
                 <button
-                  onClick={() => onUpdateBanner({ ...bannerSettings, active: !bannerSettings.active })}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-xl border transition-all ${bannerSettings.active
+                  onClick={async () => {
+                    setIsSavingBanner(true);
+                    await onUpdateBanner({ ...localBanner, active: !localBanner.active });
+                    setIsSavingBanner(false);
+                  }}
+                  disabled={isSavingBanner}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-xl border transition-all ${localBanner.active
                     ? 'bg-green-500/10 border-green-500/50 text-green-400'
                     : 'bg-stone-700 border-white/10 text-white/30'
-                    }`}
+                    } ${isSavingBanner ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
-                  <span className="text-xs font-bold uppercase">{bannerSettings.active ? 'Ativado' : 'Desativado'}</span>
-                  <div className={`w-3 h-3 rounded-full ${bannerSettings.active ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]' : 'bg-stone-500'}`}></div>
+                  <span className="text-xs font-bold uppercase">{localBanner.active ? 'Ativado' : 'Desativado'}</span>
+                  <div className={`w-3 h-3 rounded-full ${localBanner.active ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]' : 'bg-stone-500'}`}></div>
                 </button>
               </div>
 
@@ -647,8 +659,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     <label className="text-white/40 text-xs font-bold uppercase tracking-wider mb-2 block">Texto do Banner</label>
                     <input
                       type="text"
-                      value={bannerSettings.text}
-                      onChange={(e) => onUpdateBanner({ ...bannerSettings, text: e.target.value })}
+                      value={localBanner.text}
+                      onChange={(e) => setLocalBanner({ ...localBanner, text: e.target.value })}
                       placeholder="Ex: Oferta Especial: Pão de Queijo Recheado"
                       className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-brand-orange transition"
                     />
@@ -661,8 +673,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     <input
                       type="number"
                       step="0.01"
-                      value={bannerSettings.price}
-                      onChange={(e) => onUpdateBanner({ ...bannerSettings, price: parseFloat(e.target.value) || 0 })}
+                      value={localBanner.price}
+                      onChange={(e) => setLocalBanner({ ...localBanner, price: parseFloat(e.target.value) || 0 })}
                       className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-brand-orange transition"
                     />
                   </div>
@@ -670,12 +682,38 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     <label className="text-white/40 text-xs font-bold uppercase tracking-wider mb-2 block">Desconto (%)</label>
                     <input
                       type="number"
-                      value={bannerSettings.discount}
-                      onChange={(e) => onUpdateBanner({ ...bannerSettings, discount: parseInt(e.target.value) || 0 })}
+                      value={localBanner.discount}
+                      onChange={(e) => setLocalBanner({ ...localBanner, discount: parseInt(e.target.value) || 0 })}
                       className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-brand-orange transition"
                     />
                   </div>
                 </div>
+              </div>
+
+              {/* Save Button */}
+              <div className="px-6 pb-6 flex justify-end">
+                <button
+                  onClick={async () => {
+                    setIsSavingBanner(true);
+                    await onUpdateBanner(localBanner);
+                    setIsSavingBanner(false);
+                    alert('Configurações do banner salvas!');
+                  }}
+                  disabled={isSavingBanner}
+                  className="bg-brand-orange text-white px-6 py-2 rounded-xl font-bold text-sm hover:bg-orange-600 transition flex items-center gap-2 shadow-lg shadow-brand-orange/20 disabled:opacity-50"
+                >
+                  {isSavingBanner ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                      Salvando...
+                    </>
+                  ) : (
+                    <>
+                      <Save size={16} />
+                      Salvar Alterações
+                    </>
+                  )}
+                </button>
               </div>
 
               {/* Banner Preview */}
@@ -684,10 +722,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 <div className={`rounded-xl overflow-hidden pointer-events-none opacity-80 border border-white/5`}>
                   <div className="w-full bg-brand-orange text-white py-2 px-4 flex items-center justify-center gap-4 text-xs">
                     <Sparkles size={12} className="text-yellow-300" />
-                    <span className="font-bold uppercase">{bannerSettings.text || 'Texto do Banner'}</span>
+                    <span className="font-bold uppercase">{localBanner.text || 'Texto do Banner'}</span>
                     <div className="flex items-center gap-2 bg-black/10 px-2 py-0.5 rounded-full">
-                      <span className="opacity-50 line-through">R$ {bannerSettings.price.toFixed(2)}</span>
-                      <span className="font-black">R$ {(bannerSettings.price * (1 - bannerSettings.discount / 100)).toFixed(2)}</span>
+                      <span className="opacity-50 line-through">R$ {(localBanner.price || 0).toFixed(2)}</span>
+                      <span className="font-black">R$ {((localBanner.price || 0) * (1 - (localBanner.discount || 0) / 100)).toFixed(2)}</span>
                     </div>
                   </div>
                 </div>
