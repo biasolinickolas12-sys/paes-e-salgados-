@@ -637,19 +637,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   </div>
                 </div>
                 <button
-                  onClick={async () => {
-                    setIsSavingBanner(true);
-                    await onUpdateBanner({ ...localBanner, active: !localBanner.active });
-                    setIsSavingBanner(false);
-                  }}
+                  onClick={() => setLocalBanner({ ...localBanner, active: !localBanner.active })}
                   disabled={isSavingBanner}
                   className={`flex items-center gap-2 px-4 py-2 rounded-xl border transition-all ${localBanner.active
-                    ? 'bg-green-500/10 border-green-500/50 text-green-400'
+                    ? 'bg-green-500/10 border-green-500/50 text-green-400 font-bold'
                     : 'bg-stone-700 border-white/10 text-white/30'
-                    } ${isSavingBanner ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    } ${isSavingBanner ? 'opacity-50 cursor-not-allowed' : 'active:scale-95'}`}
                 >
                   <span className="text-xs font-bold uppercase">{localBanner.active ? 'Ativado' : 'Desativado'}</span>
-                  <div className={`w-3 h-3 rounded-full ${localBanner.active ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]' : 'bg-stone-500'}`}></div>
+                  <div className={`w-3 h-3 rounded-full transition-all duration-300 ${localBanner.active ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]' : 'bg-stone-500'}`}></div>
                 </button>
               </div>
 
