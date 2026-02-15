@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { LogOut, Calendar, TrendingUp, CheckCircle, Clock, Truck, Trash2, Archive, DollarSign, X, ChevronRight, Store, Lock, ShoppingBag, Edit2, Save, Users, MapPin, Phone, FileText, Copy, Bell, BellOff, Volume2 } from 'lucide-react';
+import { LogOut, Calendar, TrendingUp, CheckCircle, Clock, Truck, Trash2, Archive, DollarSign, X, ChevronRight, Store, Lock, ShoppingBag, Edit2, Save, Users, MapPin, Phone, FileText, Copy, Bell, BellOff, Volume2, Sparkles } from 'lucide-react';
 import { Product, Order } from '../types';
 import { useOrders } from '../hooks/useOrders';
 import { useCustomers } from '../hooks/useCustomers';
@@ -11,6 +11,13 @@ interface AdminDashboardProps {
   onToggleStore: () => void;
   products: Product[];
   onUpdateProductPrice: (id: number, newPrice: number) => void;
+  bannerSettings: {
+    active: boolean;
+    text: string;
+    price: number;
+    discount: number;
+  };
+  onUpdateBanner: (settings: { active: boolean; text: string; price: number; discount: number }) => void;
 }
 
 
@@ -180,7 +187,15 @@ const ProductEditCard: React.FC<{ product: Product; onUpdate: (id: number, price
 };
 
 
-export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, isStoreOpen, onToggleStore, products, onUpdateProductPrice }) => {
+export const AdminDashboard: React.FC<AdminDashboardProps> = ({
+  onLogout,
+  isStoreOpen,
+  onToggleStore,
+  products,
+  onUpdateProductPrice,
+  bannerSettings,
+  onUpdateBanner
+}) => {
   const { orders, loading: ordersLoading, updateOrderStatus, deleteOrder } = useOrders();
   const { customers, loading: customersLoading } = useCustomers();
   const [view, setView] = useState<'dashboard' | 'history' | 'catalog' | 'clients'>('dashboard');
@@ -601,22 +616,101 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, isStor
         )}
 
         {view === 'catalog' && (
-          <div className="max-w-4xl mx-auto">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl text-white font-bold flex items-center gap-2">
-                <ShoppingBag className="text-brand-orange" /> Gestão de Preços
-              </h2>
-              <span className="text-white/40 text-sm">{products.length} produtos</span>
+          <div className="max-w-4xl mx-auto space-y-8">
+            {/* Banner Promocional Management */}
+            <div className="bg-[#1F1F1F] border border-white/5 rounded-2xl overflow-hidden shadow-xl">
+              <div className="p-6 border-b border-white/5 flex justify-between items-center bg-white/5">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-brand-orange/20 rounded-lg text-brand-orange">
+                    <Sparkles size={24} />
+                  </div>
+                  <div>
+                    <h3 className="text-white font-bold text-lg">Banner Promocional</h3>
+                    <p className="text-white/40 text-xs">Exibido na página inicial do site</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => onUpdateBanner({ ...bannerSettings, active: !bannerSettings.active })}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-xl border transition-all ${bannerSettings.active
+                    ? 'bg-green-500/10 border-green-500/50 text-green-400'
+                    : 'bg-stone-700 border-white/10 text-white/30'
+                    }`}
+                >
+                  <span className="text-xs font-bold uppercase">{bannerSettings.active ? 'Ativado' : 'Desativado'}</span>
+                  <div className={`w-3 h-3 rounded-full ${bannerSettings.active ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]' : 'bg-stone-500'}`}></div>
+                </button>
+              </div>
+
+              <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-white/40 text-xs font-bold uppercase tracking-wider mb-2 block">Texto do Banner</label>
+                    <input
+                      type="text"
+                      value={bannerSettings.text}
+                      onChange={(e) => onUpdateBanner({ ...bannerSettings, text: e.target.value })}
+                      placeholder="Ex: Oferta Especial: Pão de Queijo Recheado"
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-brand-orange transition"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-white/40 text-xs font-bold uppercase tracking-wider mb-2 block">Preço (R$)</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={bannerSettings.price}
+                      onChange={(e) => onUpdateBanner({ ...bannerSettings, price: parseFloat(e.target.value) || 0 })}
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-brand-orange transition"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-white/40 text-xs font-bold uppercase tracking-wider mb-2 block">Desconto (%)</label>
+                    <input
+                      type="number"
+                      value={bannerSettings.discount}
+                      onChange={(e) => onUpdateBanner({ ...bannerSettings, discount: parseInt(e.target.value) || 0 })}
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-brand-orange transition"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Banner Preview */}
+              <div className="px-6 pb-6 mt-2">
+                <p className="text-white/20 text-[10px] font-bold uppercase tracking-widest mb-3">Prévia do Banner</p>
+                <div className={`rounded-xl overflow-hidden pointer-events-none opacity-80 border border-white/5`}>
+                  <div className="w-full bg-brand-orange text-white py-2 px-4 flex items-center justify-center gap-4 text-xs">
+                    <Sparkles size={12} className="text-yellow-300" />
+                    <span className="font-bold uppercase">{bannerSettings.text || 'Texto do Banner'}</span>
+                    <div className="flex items-center gap-2 bg-black/10 px-2 py-0.5 rounded-full">
+                      <span className="opacity-50 line-through">R$ {bannerSettings.price.toFixed(2)}</span>
+                      <span className="font-black">R$ {(bannerSettings.price * (1 - bannerSettings.discount / 100)).toFixed(2)}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <div className="space-y-3">
-              {products.map(product => (
-                <ProductEditCard
-                  key={product.id}
-                  product={product}
-                  onUpdate={onUpdateProductPrice}
-                />
-              ))}
+            <div className="max-w-4xl mx-auto">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl text-white font-bold flex items-center gap-2">
+                  <ShoppingBag className="text-brand-orange" /> Gestão de Preços
+                </h2>
+                <span className="text-white/40 text-sm">{products.length} produtos</span>
+              </div>
+
+              <div className="space-y-3">
+                {products.map(product => (
+                  <ProductEditCard
+                    key={product.id}
+                    product={product}
+                    onUpdate={onUpdateProductPrice}
+                  />
+                ))}
+              </div>
             </div>
           </div>
         )}

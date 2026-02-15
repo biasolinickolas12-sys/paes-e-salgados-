@@ -21,7 +21,7 @@ const App: React.FC = () => {
 
   // Supabase Hooks
   const { products, loading: productsLoading, updateProductPrice } = useProducts();
-  const { isStoreOpen, openingHours, toggleStoreStatus } = useStoreSettings();
+  const { isStoreOpen, openingHours, bannerSettings, toggleStoreStatus, updateBannerSettings } = useStoreSettings();
 
   const handleOrderClick = () => {
     if (!isStoreOpen) {
@@ -69,6 +69,8 @@ const App: React.FC = () => {
           <Hero
             onOrderClick={handleOrderClick}
             onAdminClick={() => setIsLoginModalOpen(true)}
+            bannerSettings={bannerSettings}
+            onBannerAction={() => setView('chat')}
           />
         </div>
       )}
@@ -107,6 +109,8 @@ const App: React.FC = () => {
           onToggleStore={handleToggleStore}
           products={products}
           onUpdateProductPrice={handleUpdateProductPrice}
+          bannerSettings={bannerSettings}
+          onUpdateBanner={updateBannerSettings}
         />
       )}
 

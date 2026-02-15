@@ -1,21 +1,44 @@
 import React from 'react';
 import { ChevronRight, Wheat, MapPin, LockKeyhole } from 'lucide-react';
+import { PromoBanner } from './PromoBanner';
 
 interface HeroProps {
   onOrderClick: () => void;
   onAdminClick: () => void;
+  bannerSettings: {
+    active: boolean;
+    text: string;
+    price: number;
+    discount: number;
+  };
+  onBannerAction: () => void;
 }
 
-export const Hero: React.FC<HeroProps> = ({ onOrderClick, onAdminClick }) => {
+export const Hero: React.FC<HeroProps> = ({
+  onOrderClick,
+  onAdminClick,
+  bannerSettings,
+  onBannerAction
+}) => {
   return (
     <div className="relative h-[100dvh] w-full overflow-hidden flex flex-col items-center justify-center bg-brand-dark">
-      
-      {/* 
+
+      <div className="fixed top-0 left-0 w-full z-[100]">
+        <PromoBanner
+          active={bannerSettings.active}
+          text={bannerSettings.text}
+          price={bannerSettings.price}
+          discount={bannerSettings.discount}
+          onAction={onBannerAction}
+        />
+      </div>
+
+      {/*
         =============================================
         ADMIN LOGIN BUTTON
         =============================================
       */}
-      <button 
+      <button
         onClick={onAdminClick}
         className="absolute top-6 right-6 z-50 text-white/20 hover:text-white/60 transition-colors p-2"
         aria-label="Acesso Admin"
@@ -29,14 +52,14 @@ export const Hero: React.FC<HeroProps> = ({ onOrderClick, onAdminClick }) => {
         =============================================
       */}
       <div className="absolute inset-0 z-0">
-        <img 
-          src="https://images.unsplash.com/photo-1608198093002-ad4e005484ec?q=80&w=1920&auto=format&fit=crop" 
-          alt="Pães Caseiros Rústicos" 
+        <img
+          src="https://images.unsplash.com/photo-1608198093002-ad4e005484ec?q=80&w=1920&auto=format&fit=crop"
+          alt="Pães Caseiros Rústicos"
           className="w-full h-full object-cover opacity-60 scale-105 animate-[zoom_40s_infinite_alternate]"
         />
         {/* Vignette Overlay for focus and text readability */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/80" />
-        <div className="absolute inset-0 bg-brand-dark/20 mix-blend-multiply" /> 
+        <div className="absolute inset-0 bg-brand-dark/20 mix-blend-multiply" />
       </div>
 
       {/* 
@@ -45,7 +68,7 @@ export const Hero: React.FC<HeroProps> = ({ onOrderClick, onAdminClick }) => {
         =============================================
       */}
       <div className="relative z-10 w-full max-w-lg px-6 flex flex-col items-center text-center space-y-6 md:space-y-8 animate-slide-up">
-        
+
         {/* "Homemade" Badge */}
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 shadow-lg mb-2">
           <Wheat size={16} className="text-brand-gold" />
@@ -79,7 +102,7 @@ export const Hero: React.FC<HeroProps> = ({ onOrderClick, onAdminClick }) => {
            CTA BUTTON - Modified to be Lighter and Smaller
         */}
         <div className="pt-4 pb-8 w-full flex justify-center">
-          <button 
+          <button
             onClick={onOrderClick}
             className="group relative w-auto px-8 py-3.5 bg-orange-500 hover:bg-orange-600 text-white rounded-xl shadow-[0_4px_20px_rgba(249,115,22,0.4)] hover:shadow-[0_6px_25px_rgba(249,115,22,0.6)] transition-all duration-300 transform hover:-translate-y-1 flex items-center justify-center gap-3 animate-pulse-action"
           >

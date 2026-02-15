@@ -110,18 +110,30 @@ export interface Database {
                     id: number
                     is_open: boolean
                     opening_hours: string | null
+                    banner_active: boolean
+                    banner_text: string | null
+                    banner_price: number | null
+                    banner_discount: number | null
                     updated_at: string
                 }
                 Insert: {
                     id?: number
                     is_open?: boolean
                     opening_hours?: string | null
+                    banner_active?: boolean
+                    banner_text?: string | null
+                    banner_price?: number | null
+                    banner_discount?: number | null
                     updated_at?: string
                 }
                 Update: {
                     id?: number
                     is_open?: boolean
                     opening_hours?: string | null
+                    banner_active?: boolean
+                    banner_text?: string | null
+                    banner_price?: number | null
+                    banner_discount?: number | null
                     updated_at?: string
                 }
             }
