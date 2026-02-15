@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 
 export function useStoreSettings() {
+    const [settingsId, setSettingsId] = useState<number | null>(null);
     const [isStoreOpen, setIsStoreOpen] = useState(true);
     const [openingHours, setOpeningHours] = useState('Terça a Domingo das 14h às 22h');
     const [bannerSettings, setBannerSettings] = useState({
@@ -29,6 +30,7 @@ export function useStoreSettings() {
 
             if (data) {
                 const settings = data as any;
+                setSettingsId(settings.id);
                 setIsStoreOpen(settings.is_open);
                 setOpeningHours(settings.opening_hours || 'Terça a Domingo das 14h às 22h');
                 setBannerSettings({
@@ -46,6 +48,7 @@ export function useStoreSettings() {
     }
 
     async function toggleStoreStatus() {
+        if (!settingsId) return { success: false, error: 'ID de configurações não encontrado' };
         try {
             const newStatus = !isStoreOpen;
 
@@ -55,7 +58,7 @@ export function useStoreSettings() {
                     is_open: newStatus,
                     updated_at: new Date().toISOString()
                 } as any)
-                .eq('id', 1);
+                .eq('id', settingsId);
 
             if (error) throw error;
 
@@ -68,6 +71,7 @@ export function useStoreSettings() {
     }
 
     async function updateBannerSettings(settings: { active: boolean; text: string; price: number; discount: number }) {
+        if (!settingsId) return { success: false, error: 'ID de configurações não encontrado' };
         try {
             const { error } = await supabase
                 .from('store_settings')
@@ -78,15 +82,16 @@ export function useStoreSettings() {
                     banner_discount: settings.discount,
                     updated_at: new Date().toISOString()
                 } as any)
-                .eq('id', 1);
+                .eq('id', settingsId);
 
             if (error) throw error;
 
             setBannerSettings(settings);
             return { success: true };
-        } catch (err) {
+        } catch (err: any) {
             console.error('Error updating banner settings:', err);
-            return { success: false, error: err instanceof Error ? err.message : 'Erro ao atualizar banner' };
+            const errorMessage = err?.message || (typeof err === 'string' ? err : 'Erro ao atualizar banner');
+            return { success: false, error: errorMessage };
         }
     }
 

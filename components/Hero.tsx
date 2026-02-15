@@ -33,19 +33,6 @@ export const Hero: React.FC<HeroProps> = ({
         />
       </div>
 
-      {/*
-        =============================================
-        ADMIN LOGIN BUTTON
-        =============================================
-      */}
-      <button
-        onClick={onAdminClick}
-        className="absolute top-6 right-6 z-50 text-white/20 hover:text-white/60 transition-colors p-2"
-        aria-label="Acesso Admin"
-      >
-        <LockKeyhole size={20} />
-      </button>
-
       {/* 
         =============================================
         BACKGROUND IMAGE (Rustic Breads)
@@ -62,15 +49,23 @@ export const Hero: React.FC<HeroProps> = ({
         <div className="absolute inset-0 bg-brand-dark/20 mix-blend-multiply" />
       </div>
 
-      {/* 
-        =============================================
-        CENTRAL CONTENT
-        =============================================
-      */}
-      <div className="relative z-10 w-full max-w-lg px-6 flex flex-col items-center text-center space-y-6 md:space-y-8 animate-slide-up">
+      <div className="relative z-10 w-full max-w-lg px-6 flex flex-col items-center text-center space-y-4 md:space-y-6 animate-slide-up">
+
+        {/* 
+          =============================================
+          ADMIN LOGIN BUTTON - Relocated to avoid banner overlap
+          =============================================
+        */}
+        <button
+          onClick={onAdminClick}
+          className="text-white/10 hover:text-white/40 transition-colors p-1"
+          aria-label="Acesso Admin"
+        >
+          <LockKeyhole size={14} />
+        </button>
 
         {/* "Homemade" Badge */}
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 shadow-lg mb-2">
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 shadow-lg">
           <Wheat size={16} className="text-brand-gold" />
           <span className="text-brand-cream font-hand text-xl tracking-wider">Padaria Artesanal & Familiar</span>
         </div>

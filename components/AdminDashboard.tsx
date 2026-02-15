@@ -691,9 +691,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 <button
                   onClick={async () => {
                     setIsSavingBanner(true);
-                    await onUpdateBanner(localBanner);
+                    const result = await onUpdateBanner(localBanner) as any;
                     setIsSavingBanner(false);
-                    alert('Configurações do banner salvas!');
+                    if (result?.success) {
+                      alert('Configurações do banner salvas com sucesso!');
+                    } else {
+                      alert('Erro ao salvar as configurações: ' + (result?.error || 'Erro desconhecido'));
+                    }
                   }}
                   disabled={isSavingBanner}
                   className="bg-brand-orange text-white px-6 py-2 rounded-xl font-bold text-sm hover:bg-orange-600 transition flex items-center gap-2 shadow-lg shadow-brand-orange/20 disabled:opacity-50"
