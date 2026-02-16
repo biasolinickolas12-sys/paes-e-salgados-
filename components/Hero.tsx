@@ -56,13 +56,6 @@ export const Hero: React.FC<HeroProps> = ({
           ADMIN LOGIN BUTTON - Relocated to avoid banner overlap
           =============================================
         */}
-        <button
-          onClick={onAdminClick}
-          className="text-white/10 hover:text-white/40 transition-colors p-1"
-          aria-label="Acesso Admin"
-        >
-          <LockKeyhole size={14} />
-        </button>
 
         {/* "Homemade" Badge */}
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 shadow-lg">
@@ -109,10 +102,19 @@ export const Hero: React.FC<HeroProps> = ({
           </button>
         </div>
 
-        {/* Footer Info (Delivery Location) */}
-        <div className="flex items-center justify-center gap-2 text-white/90 text-xs md:text-sm font-bold uppercase tracking-widest pt-2 drop-shadow-md">
-          <MapPin size={16} className="text-orange-400" />
-          <span className="drop-shadow-sm">Entregamos em São Roque e Mairinque</span>
+        <div className="flex flex-col items-center gap-4 pt-2">
+          <div className="flex items-center justify-center gap-2 text-white/90 text-xs md:text-sm font-bold uppercase tracking-widest drop-shadow-md">
+            <MapPin size={16} className="text-orange-400" />
+            <span className="drop-shadow-sm">Entregamos em São Roque e Mairinque</span>
+          </div>
+
+          <button
+            onClick={onAdminClick}
+            className="text-white/10 hover:text-white/40 transition-colors p-1"
+            aria-label="Acesso Admin"
+          >
+            <LockKeyhole size={14} />
+          </button>
         </div>
 
       </div>
